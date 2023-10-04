@@ -27,6 +27,25 @@ class AppClient(RestClient):
             tb = ex.__traceback__
             raise RuntimeError(f"failed retrieving authenticated app:\n{ex}").with_traceback(tb)
 
+    def get_app_installations(self) -> list[dict[str, Any]]:
+        print_debug("retrieving app installations")
+
+        try:
+            return self.requester.request_paged_json("GET", "/app/installations")
+        except GitHubException as ex:
+            tb = ex.__traceback__
+            raise RuntimeError(f"failed retrieving authenticated app:\n{ex}").with_traceback(tb)
+
+    def create_installation_access_token(self, installation_id: str) -> str:
+        print_debug(f"creating an installation access token for installation '{installation_id}'")
+
+        try:
+            response = self.requester.request_json("POST", f"/app/installations/{installation_id}/access_tokens")
+            return response["token"]
+        except GitHubException as ex:
+            tb = ex.__traceback__
+            raise RuntimeError(f"failed creating installation access token:\n{ex}").with_traceback(tb)
+
     def get_app_ids(self, app_slug: str) -> tuple[int, str]:
         print_debug("retrieving app node id")
 

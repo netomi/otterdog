@@ -27,6 +27,24 @@ aiohttp-client-cache = "^0.9"
 aiofiles = "^23.2"
 aiosqlite = "^0.19"
 
+[tool.poetry.group.app.dependencies]
+flask = "^2.3"
+flask-login = "^0.6"
+flask-migrate = "^3.1"
+flask-dance = "^7.0"
+flask-restx = "^1.1"
+flask-wtf = "^1.1"
+flask-sqlalchemy = "^3.1"
+sqlalchemy = {extras = ["mypy"], version = "^2.0"}
+WTForms = "^3.0"
+email-validator = "^2.0"
+python-decouple = "^3.8"
+gunicorn = "^21.2"
+jinja2 = "^3.1"
+Werkzeug = "^2.3"
+python-dotenv = "^1.0"
+pydantic = "^2.4"
+
 [tool.poetry.group.dev.dependencies]
 flake8 = "^6.0"
 pre-commit = "^3.3"
@@ -41,6 +59,7 @@ types-colorama = "^0.4"
 types-requests = "^2.30"
 types-jsonschema = "^4.17"
 types-chevron = "^0.14"
+types-Flask-Migrate = "^4.0"
 
 [tool.poetry.group.docs]
 optional = true
@@ -49,7 +68,7 @@ optional = true
 mkdocs = "^1.4"
 mkdocs-material = "^9.1"
 mkdocs-exclude = "^1.0"
-jinja2 = "3.0.3"
+jinja2 = "^3.1"
 
 [tool.poetry.scripts]
 otterdog = "otterdog.cli:cli"
@@ -69,3 +88,6 @@ color = true
 line-length = 120
 target-version = ['py310']
 skip-string-normalization = true
+
+[tool.mypy]
+plugins = "sqlalchemy.ext.mypy.plugin"

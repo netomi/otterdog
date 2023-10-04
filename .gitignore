@@ -17,6 +17,8 @@ orgs*
 ### Ignoring data to test
 data
 
+### Ignoring web app related files
+.env
 
 #### Ignoring swp files
 *.swp
