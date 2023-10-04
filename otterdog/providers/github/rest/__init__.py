@@ -43,6 +43,12 @@ class RestApi:
         return ContentClient(self)
 
     @cached_property
+    def issue(self):
+        from .issue_client import IssueClient
+
+        return IssueClient(self)
+
+    @cached_property
     def repo(self):
         from .repo_client import RepoClient
 

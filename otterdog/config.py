@@ -16,7 +16,7 @@ from typing import Any, Optional
 import jq  # type: ignore
 
 from . import credentials
-from .credentials import CredentialProvider, bitwarden_provider, pass_provider
+from .credentials import CredentialProvider, bitwarden_provider, pass_provider, plain_provider
 from .jsonnet import JsonnetConfig
 
 
@@ -172,6 +172,10 @@ class OtterdogConfig:
                     )
 
                     provider = pass_provider.PassVault(password_store_dir)
+                    self._credential_providers[provider_type] = provider
+
+                case "plain":
+                    provider = plain_provider.PlainProvider()
                     self._credential_providers[provider_type] = provider
 
                 case _:
