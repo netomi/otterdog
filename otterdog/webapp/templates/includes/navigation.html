@@ -1,0 +1,30 @@
+	<!-- [ Header ] start -->
+	<header class="pc-header ">
+		<div class="header-wrapper">
+			<div class="ms-auto">
+				<ul class="list-unstyled">
+					<li class="dropdown pc-h-item">
+						<a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button"
+							aria-haspopup="false" aria-expanded="false">
+							<img src="https://avatars.githubusercontent.com/{{ current_user.oauth_github }}" alt="user-image" class="user-avtar">
+							<span>
+								<span class="user-name">
+									{{ current_user.username }}
+								</span>
+								<span class="user-desc">
+									{{ current_user.email }}
+								</span>
+							</span>
+						</a>
+						<div class="dropdown-menu dropdown-menu-end pc-h-dropdown">
+							<a href="{{ url_for('authentication_blueprint.logout') }}" class="dropdown-item">
+								<i class="material-icons-two-tone">chrome_reader_mode</i>
+								<span>Logout</span>
+							</a>
+						</div>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</header>
+	<!-- [ Header ] end -->

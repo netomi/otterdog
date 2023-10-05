@@ -1,0 +1,130 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Tables {% endblock %} 
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <!-- [ Main Content ] start -->
+    <section class="pc-container">
+        <div class="pcoded-content">
+            <!-- [ breadcrumb ] start -->
+            <div class="page-header">
+                <div class="page-block">
+                    <div class="row align-items-center">
+                        <div class="col-md-12">
+                            <div class="page-header-title">
+                                <h5 class="m-b-10">{{ org.github_id }}</h5>
+                            </div>
+                            <ul class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                                <li class="breadcrumb-item"><a href="/organizations">Organizations</a></li>
+                                <li class="breadcrumb-item">{{ org.github_id }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- [ breadcrumb ] end -->
+            <!-- [ Main Content ] start -->
+
+            <div class="row">
+                <!-- [ table ] start -->
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Organization Settings</h5>
+                        </div>
+                        <div class="card-body table-border-style">
+                            <div class="table-responsive">
+                                <pre>
+                                    <code class="language-json">
+settings {
+    billing_email                                            : "webmaster@eclipse-foundation.org",
+    blog                                                     : "https://adoptium.net",
+    company                                                  : null,
+    default_branch_name                                      : "main",
+    default_repository_permission                            : "none",
+    dependabot_alerts_enabled_for_new_repositories           : true,
+    dependabot_security_updates_enabled_for_new_repositories : true,
+    dependency_graph_enabled_for_new_repositories            : true,
+    description                                              : "The Adoptium Working Group promotes and supports high-quality runtimes and associated technology for use across the Java ecosystem",
+    discussion_source_repository                             : null,
+    email                                                    : null,
+    has_discussions                                          : false,
+    has_organization_projects                                : true,
+    has_repository_projects                                  : true,
+    location                                                 : null,
+    members_can_change_project_visibility                    : true,
+    members_can_change_repo_visibility                       : false,
+    members_can_create_private_repositories                  : false,
+    members_can_create_public_pages                          : true,
+    members_can_create_public_repositories                   : false,
+    members_can_create_teams                                 : false,
+    members_can_delete_issues                                : false,
+    members_can_delete_repositories                          : false,
+    members_can_fork_private_repositories                    : false,
+    name                                                     : "Eclipse Adoptium",
+    packages_containers_internal                             : true,
+    packages_containers_public                               : true,
+    plan                                                     : "free",
+    readers_can_create_discussions                           : true,
+    security_managers                                        : [
+        "eclipsefdn-security",
+        "adoptium-aqavit-project-leads",
+        "adoptium-project-leads",
+        "adoptium-temurin-project-leads",
+    ],
+    twitter_username                                         : "adoptium",
+    two_factor_requirement                                   : true,
+    web_commit_signoff_required                              : false,
+    workflows                                                : {
+        actions_can_approve_pull_request_reviews                 : true,
+        allow_action_patterns                                    : [],
+        allow_github_owned_actions                               : true,
+        allow_verified_creator_actions                           : true,
+        allowed_actions                                          : "all",
+        default_workflow_permissions                             : "write",
+        enabled_repositories                                     : "all",
+        selected_repositories                                    : [],
+    },
+},
+                                    </code>
+                                </pre>
+<!--                                <table class="table table-hover">-->
+<!--                                    <thead>-->
+<!--                                        <tr>-->
+<!--                                            <th>Installation ID</th>-->
+<!--                                            <th>Name</th>-->
+<!--                                            <th></i>&nbsp;GitHub</th>-->
+<!--                                            <th>Eclipse Project</th>-->
+<!--                                        </tr>-->
+<!--                                    </thead>-->
+<!--                                    <tbody>-->
+<!--                                        {% for org in organizations %}-->
+<!--                                        <tr>-->
+<!--                                            <td>{{ org.id }}</td>-->
+<!--                                            <td><a href="/org/{{ org.github_id }}">{{ org.github_id }}</a></td>-->
+<!--                                            <td><a href="https://github.com/{{ org.github_id }}" target="_blank"><i class="fab fa-github"></i></a></td>-->
+<!--                                            <td>&nbsp;</td>-->
+<!--                                        </tr>-->
+<!--                                        {% endfor %}-->
+<!--                                    </tbody>-->
+<!--                                </table>-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- [ table ] end -->
+            </div>
+            <!-- [ Main Content ] end -->
+        </div>
+    </section>
+    <!-- [ Main Content ] end -->
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

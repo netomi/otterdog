@@ -1,0 +1,74 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Organizations {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <!-- [ Main Content ] start -->
+    <section class="pc-container">
+        <div class="pcoded-content">
+            <!-- [ breadcrumb ] start -->
+            <div class="page-header">
+                <div class="page-block">
+                    <div class="row align-items-center">
+                        <div class="col-md-12">
+                            <div class="page-header-title">
+                                <h5 class="m-b-10">GitHub organizations</h5>
+                            </div>
+                            <ul class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/index">Home</a></li>
+                                <li class="breadcrumb-item">Organizations</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- [ breadcrumb ] end -->
+            <!-- [ Main Content ] start -->
+            <div class="row">
+                <!-- [ table ] start -->
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>List of enabled GitHub organizations</h5>
+                        </div>
+                        <div class="card-body table-border-style">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Installation ID</th>
+                                            <th>Name</th>
+                                            <th></i>&nbsp;GitHub</th>
+                                            <th>Eclipse Project</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for org in organizations %}
+                                        <tr>
+                                            <td>{{ org.id }}</td>
+                                            <td><a href="/organizations/{{ org.github_id }}">{{ org.github_id }}</a></td>
+                                            <td><a href="https://github.com/{{ org.github_id }}" target="_blank"><i class="fab fa-github"></i></a></td>
+                                            <td>&nbsp;</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- [ table ] end -->
+            </div>
+            <!-- [ Main Content ] end -->
+        </div>
+    </section>
+    <!-- [ Main Content ] end -->
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
