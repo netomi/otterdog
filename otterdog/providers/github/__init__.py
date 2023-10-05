@@ -52,9 +52,9 @@ class GitHubProvider:
             self.rest_api.close()
 
     def _init_clients(self):
-        from .rest.auth.token import TokenAuthStrategy
+        from .rest.auth import token_auth
 
-        self.rest_api = RestApi(TokenAuthStrategy(self._credentials.github_token))
+        self.rest_api = RestApi(token_auth(self._credentials.github_token))
         self.web_client = WebClient(self._credentials)
         self.graphql_client = GraphQLClient(self._credentials.github_token)
 

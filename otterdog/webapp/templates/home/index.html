@@ -1,0 +1,73 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Dashboard {% endblock %} 
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <!-- [ Main Content ] start -->
+    <div class="pc-container">
+        <div class="pcoded-content">
+            <!-- [ breadcrumb ] start -->
+            <div class="page-header">
+                <div class="page-block">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <div class="page-header-title">
+                                <h5 class="m-b-10">Eclipse GitHub Dashboard</h5>
+                            </div>
+                            <ul class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                                <li class="breadcrumb-item">Dashboard</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- [ breadcrumb ] end -->
+            <!-- [ Main Content ] start -->
+            <div class="row">
+                <!-- support-section start -->
+                <div class="col-xl-6 col-md-12">
+                    <div class="card flat-card">
+                        <div class="row-table">
+                            <div class="col-sm-6 card-body br">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <i class="material-icons-two-tone text-primary mb-1">corporate_fare</i>
+                                    </div>
+                                    <div class="col-sm-8 text-md-center">
+                                        <h5>{{ organizations | length }}</h5>
+                                        <span><a href="/organizations">Projects</a></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 d-none d-md-table-cell d-lg-table-cell d-xl-table-cell card-body br">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <i class="material-icons-two-tone text-primary mb-1">language</i>
+                                    </div>
+                                    <div class="col-sm-8 text-md-center">
+                                        <h5>N/A</h5>
+                                        <span>Repositories</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- support-section end -->
+            </div>
+            <!-- [ Main Content ] end -->
+        </div>
+    </div>
+    <!-- [ Main Content ] end -->
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+{% endblock javascripts %}
