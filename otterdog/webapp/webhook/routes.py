@@ -7,12 +7,13 @@
 # *******************************************************************************
 
 import json
+from typing import Any
 
 from flask import request, Response
 
 from logging import getLogger
 
-from otterdog.webapp.tasks.pull_requests import handle_pull_request
+from otterdog.webapp.tasks.pull_request_event import handle_pull_request_event
 
 from . import blueprint
 
@@ -26,9 +27,21 @@ def receive():
 
     json_data = request.get_json()
 
-    if "pull_request" in json_data:
-        handle_pull_request.delay(json_data)
+    if is_pull_request_event(json_data):
+        handle_pull_request_event.delay(json_data)
     else:
         logger.debug(f"received unknown event, skipping:\n{json.dumps(json_data, indent=2)}")
 
     return Response({}, mimetype="application/json", status=200)
+
+
+def is_pull_request_event(json_data: dict[str, Any]) -> bool:
+    return "pull_request" in json_data
+
+
+def is_push_event(json_data: dict[str, Any]) -> bool:
+    for attr in ["ref", "before", "after"]:
+        if attr not in json_data:
+            return False
+
+    return True

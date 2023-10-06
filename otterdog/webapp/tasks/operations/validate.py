@@ -8,18 +8,18 @@
 
 import os
 import re
+import filecmp
 
 from io import StringIO
 from logging import getLogger
-from typing import Optional
 
 from otterdog.config import OtterdogConfig
 from otterdog.operations.local_plan_operation import LocalPlanOperation
 from otterdog.providers.github import RestApi
 from otterdog.utils import IndentingPrinter
 
-from . import get_rest_api_for_installation
-from .models import PullRequestEvent
+from otterdog.webapp.tasks import get_rest_api_for_installation
+from otterdog.webapp.tasks.models import PullRequestEvent
 
 logger = getLogger(__name__)
 
@@ -50,16 +50,22 @@ def validate_pull_request(event: PullRequestEvent) -> None:
     jsonnet_config.init_template()
 
     # get BASE config
-    get_config(rest_api, org_id, otterdog_config.default_config_repo, jsonnet_config.org_config_file + "-BASE")
+    base_file = jsonnet_config.org_config_file + "-BASE"
+    get_config(rest_api, org_id, otterdog_config.default_config_repo, base_file, event.pull_request.base.ref)
 
     # get HEAD config from PR
+    head_file = jsonnet_config.org_config_file
     get_config(
         rest_api,
         org_id,
         otterdog_config.default_config_repo,
-        jsonnet_config.org_config_file,
-        pull_request_number,
+        head_file,
+        event.pull_request.head.ref,
     )
+
+    if filecmp.cmp(base_file, head_file):
+        logger.info("head and base config are identical, no need to validate")
+        return
 
     output = StringIO()
     printer = IndentingPrinter(output)
@@ -85,27 +91,16 @@ def validate_pull_request(event: PullRequestEvent) -> None:
     rest_api.issue.create_comment(org_id, otterdog_config.default_config_repo, pull_request_number, result)
 
 
-def get_config(rest_api: RestApi, org_id: str, repo: str, filename: str, pull_request: Optional[str] = None):
+def get_config(rest_api: RestApi, org_id: str, repo: str, filename: str, ref: str):
     path = f"otterdog/{org_id}.jsonnet"
-    content = get_content(rest_api, org_id, repo, path, pull_request)
-    with open(filename, "w") as file:
-        file.write(content)
-
-
-def get_content(client: RestApi, org_id: str, repo: str, path: str, pull_request: Optional[str] = None) -> str:
-    if pull_request is not None:
-        ref = client.repo.get_ref_for_pull_request(org_id, repo, pull_request)
-    else:
-        ref = None
-
-    content = client.content.get_content(
+    content = rest_api.content.get_content(
         org_id,
         repo,
         path,
         ref,
     )
-
-    return content
+    with open(filename, "w") as file:
+        file.write(content)
 
 
 def escape_for_github(text: str) -> str:
