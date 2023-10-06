@@ -82,6 +82,29 @@ class PullRequest(BaseModel):
     base: Ref
 
 
+class Comment(BaseModel):
+    """Represents a comment in an issue."""
+
+    id: int
+    node_id: str
+    user: Actor
+    body: str
+    created_at: str
+    updated_at: str
+
+
+class Issue(BaseModel):
+    """Represents an issue"""
+
+    number: int
+    node_id: str
+    title: str
+    state: str
+    draft: bool
+    body: Optional[str]
+    html_url: str
+
+
 class Event(ABC, BaseModel):
     """Base class of events"""
 
@@ -111,3 +134,11 @@ class PushEvent(Event):
     created: bool
     deleted: bool
     forced: bool
+
+
+class IssueCommentEvent(Event):
+    """A payload sent for issue comment events."""
+
+    issue: Issue
+    comment: Comment
+    repository: Repository

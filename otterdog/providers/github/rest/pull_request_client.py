@@ -5,6 +5,7 @@
 # which is available at https://spdx.org/licenses/MIT.html
 # SPDX-License-Identifier: MIT
 # *******************************************************************************
+from typing import Any
 
 from otterdog.utils import print_debug
 
@@ -12,18 +13,15 @@ from . import RestApi, RestClient
 from ..exception import GitHubException
 
 
-class IssueClient(RestClient):
+class PullRequestClient(RestClient):
     def __init__(self, rest_api: RestApi):
         super().__init__(rest_api)
 
-    def create_comment(self, org_id: str, repo_name: str, issue_number: str, body: str) -> None:
-        print_debug(f"creating issue comment for issue '{issue_number}' at '{org_id}/{repo_name}'")
+    def get_pull_request(self, org_id: str, repo_name: str, pull_request_number: str) -> dict[str, Any]:
+        print_debug(f"getting pull request with number '{pull_request_number}' from repo '{org_id}/{repo_name}'")
 
         try:
-            data = {"body": body}
-            return self.requester.request_json(
-                "POST", f"/repos/{org_id}/{repo_name}/issues/{issue_number}/comments", data=data
-            )
+            return self.requester.request_json("GET", f"/repos/{org_id}/{repo_name}/pulls/{pull_request_number}")
         except GitHubException as ex:
             tb = ex.__traceback__
-            raise RuntimeError(f"failed creating issue comment:\n{ex}").with_traceback(tb)
+            raise RuntimeError(f"failed retrieving pull request:\n{ex}").with_traceback(tb)

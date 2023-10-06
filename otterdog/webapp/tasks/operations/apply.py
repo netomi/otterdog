@@ -13,42 +13,41 @@ from logging import getLogger
 
 from otterdog.config import OtterdogConfig
 from otterdog.operations.apply_operation import ApplyOperation
-from otterdog.utils import IndentingPrinter
+from otterdog.utils import IndentingPrinter, LogLevel
 
 from otterdog.webapp.tasks import get_rest_api_for_installation
-from otterdog.webapp.tasks.models import PullRequestEvent
+from otterdog.webapp.tasks.models import PullRequest, Repository
 
 from .validate import get_config, escape_for_github
 
 logger = getLogger(__name__)
 
 
-def apply_pull_request(event: PullRequestEvent) -> None:
+def apply_pull_request(
+    org_id: str,
+    installation_id: int,
+    pull_request: PullRequest,
+    repository: Repository,
+    otterdog_config: OtterdogConfig,
+) -> None:
     """Validates a PR and adds the result as a comment."""
 
-    # TODO: make the config configurable and load it, e.g. from github
-    otterdog_config = OtterdogConfig("otterdog-test.json", False)
-
-    if event.repository.name != otterdog_config.default_config_repo:
-        return
-
-    if event.pull_request.base.ref != event.repository.default_branch:
+    if pull_request.base.ref != repository.default_branch:
         logger.info(
             "pull request merged into '%s' which is not the default branch '%s', ignoring",
-            event.pull_request.base.ref,
-            event.repository.default_branch,
+            pull_request.base.ref,
+            repository.default_branch,
         )
         return
 
-    assert event.pull_request.merged is True
-    assert event.pull_request.merge_commit_sha is not None
+    assert pull_request.merged is True
+    assert pull_request.merge_commit_sha is not None
 
-    logger.info("applying merged pull request #%d for repo '%s'", event.pull_request.number, event.repository.full_name)
+    logger.info("applying merged pull request #%d for repo '%s'", pull_request.number, repository.full_name)
 
-    org_id = event.organization.login
-    pull_request_number = str(event.pull_request.number)
+    pull_request_number = str(pull_request.number)
 
-    rest_api = get_rest_api_for_installation(event.installation.id)
+    rest_api = get_rest_api_for_installation(installation_id)
 
     org_config = otterdog_config.get_organization_config(org_id)
     org_config.credential_data = {"provider": "plain", "api_token": rest_api.token}
@@ -66,11 +65,11 @@ def apply_pull_request(event: PullRequestEvent) -> None:
         org_id,
         otterdog_config.default_config_repo,
         head_file,
-        event.pull_request.merge_commit_sha,
+        pull_request.merge_commit_sha,
     )
 
     output = StringIO()
-    printer = IndentingPrinter(output)
+    printer = IndentingPrinter(output, log_level=LogLevel.ERROR)
     operation = ApplyOperation(True, True, False, False, "", False)
     operation.init(otterdog_config, printer)
 

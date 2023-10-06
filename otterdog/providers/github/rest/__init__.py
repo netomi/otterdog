@@ -61,6 +61,12 @@ class RestApi:
         return IssueClient(self)
 
     @cached_property
+    def pull_request(self):
+        from .pull_request_client import PullRequestClient
+
+        return PullRequestClient(self)
+
+    @cached_property
     def repo(self):
         from .repo_client import RepoClient
 
