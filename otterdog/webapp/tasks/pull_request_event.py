@@ -12,6 +12,8 @@ from typing import Any
 from celery import shared_task  # type: ignore
 from pydantic import ValidationError
 
+from otterdog.config import OtterdogConfig
+
 from .models import PullRequestEvent
 from .operations.apply import apply_pull_request
 from .operations.validate import validate_pull_request
@@ -27,7 +29,17 @@ def handle_pull_request_event(event_data: dict[str, Any]) -> None:
         logger.error("failed to load pull request event data", exc_info=True)
         return
 
+    # TODO: make the config configurable and load it, e.g. from github
+    otterdog_config = OtterdogConfig("otterdog-test.json", False)
+
+    if event.repository.name != otterdog_config.default_config_repo:
+        return
+
     if event.action in ["opened", "synchronize", "edited"] and event.pull_request.draft is False:
-        validate_pull_request(event)
+        validate_pull_request(
+            event.organization.login, event.installation.id, event.pull_request, event.repository, otterdog_config
+        )
     elif event.action in ["closed"] and event.pull_request.merged is True:
-        apply_pull_request(event)
+        apply_pull_request(
+            event.organization.login, event.installation.id, event.pull_request, event.repository, otterdog_config
+        )

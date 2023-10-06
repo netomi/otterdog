@@ -13,6 +13,7 @@ import re
 import sys
 from argparse import Namespace
 from dataclasses import dataclass
+from enum import Enum
 from typing import Any, Callable, Literal, TypeVar, Generic, Optional, TypeGuard, TextIO
 from urllib.parse import urlparse
 
@@ -235,13 +236,23 @@ def multi_associate_by_key(input_list: list[T], key_func: Callable[[T], list[str
     return result
 
 
+class LogLevel(Enum):
+    GLOBAL = 0
+    INFO = 1
+    WARN = 2
+    ERROR = 3
+
+
 class IndentingPrinter:
-    def __init__(self, writer: TextIO, initial_offset: int = 0, spaces_per_level: int = 2):
+    def __init__(
+        self, writer: TextIO, initial_offset: int = 0, spaces_per_level: int = 2, log_level: LogLevel = LogLevel.GLOBAL
+    ):
         self._writer = writer
         self._initial_offset = " " * initial_offset
         self._level = 0
         self._spaces_per_level = spaces_per_level
         self._indented_line = False
+        self._log_level = log_level
 
     @property
     def _current_indentation(self) -> str:
@@ -279,20 +290,25 @@ class IndentingPrinter:
         self._level -= 1
         assert self._level >= 0
 
+    def _is_logging_enabled(self, level: int, global_fn: Callable[[], bool]) -> bool:
+        match self._log_level:
+            case LogLevel.GLOBAL:
+                return global_fn()
+
+            case _:
+                return self._log_level.value <= level
+
     def print_info(self, msg: str) -> None:
-        print_info(msg, self._writer)
-
-    def print_debug(self, msg: str) -> None:
-        print_debug(msg, self._writer)
-
-    def print_trace(self, msg: str) -> None:
-        print_trace(msg, self._writer)
+        if self._is_logging_enabled(1, is_info_enabled):
+            _print_message(msg, Fore.GREEN, "Info", self._writer)
 
     def print_warn(self, msg: str) -> None:
-        print_warn(msg, self._writer)
+        if self._is_logging_enabled(2, is_info_enabled):
+            _print_message(msg, Fore.YELLOW, "Warning", self._writer)
 
     def print_error(self, msg: str) -> None:
-        print_error(msg, self._writer)
+        if self._is_logging_enabled(3, is_info_enabled):
+            _print_message(msg, Fore.YELLOW, "Error", self._writer)
 
 
 def jsonnet_evaluate_file(file: str) -> dict[str, Any]:

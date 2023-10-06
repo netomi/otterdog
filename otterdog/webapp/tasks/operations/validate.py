@@ -16,29 +16,31 @@ from logging import getLogger
 from otterdog.config import OtterdogConfig
 from otterdog.operations.local_plan_operation import LocalPlanOperation
 from otterdog.providers.github import RestApi
-from otterdog.utils import IndentingPrinter
+from otterdog.utils import IndentingPrinter, LogLevel
 
 from otterdog.webapp.tasks import get_rest_api_for_installation
-from otterdog.webapp.tasks.models import PullRequestEvent
+from otterdog.webapp.tasks.models import PullRequest, Repository
 
 logger = getLogger(__name__)
 
 
-def validate_pull_request(event: PullRequestEvent) -> None:
+def validate_pull_request(
+    org_id: str,
+    installation_id: int,
+    pull_request: PullRequest,
+    repository: Repository,
+    otterdog_config: OtterdogConfig,
+    log_level: LogLevel = LogLevel.WARN,
+) -> None:
     """Validates a PR and adds the result as a comment."""
 
-    # TODO: make the config configurable and load it, e.g. from github
-    otterdog_config = OtterdogConfig("otterdog-test.json", False)
+    logger.info(
+        "validating pull request #%d for repo '%s' with level %s", pull_request.number, repository.full_name, log_level
+    )
 
-    if event.repository.name != otterdog_config.default_config_repo:
-        return
+    pull_request_number = str(pull_request.number)
 
-    logger.info("validating pull request #%d for repo '%s'", event.pull_request.number, event.repository.full_name)
-
-    org_id = event.organization.login
-    pull_request_number = str(event.pull_request.number)
-
-    rest_api = get_rest_api_for_installation(event.installation.id)
+    rest_api = get_rest_api_for_installation(installation_id)
 
     org_config = otterdog_config.get_organization_config(org_id)
     org_config.credential_data = {"provider": "plain", "api_token": rest_api.token}
@@ -51,7 +53,7 @@ def validate_pull_request(event: PullRequestEvent) -> None:
 
     # get BASE config
     base_file = jsonnet_config.org_config_file + "-BASE"
-    get_config(rest_api, org_id, otterdog_config.default_config_repo, base_file, event.pull_request.base.ref)
+    get_config(rest_api, org_id, otterdog_config.default_config_repo, base_file, pull_request.base.ref)
 
     # get HEAD config from PR
     head_file = jsonnet_config.org_config_file
@@ -60,7 +62,7 @@ def validate_pull_request(event: PullRequestEvent) -> None:
         org_id,
         otterdog_config.default_config_repo,
         head_file,
-        event.pull_request.head.ref,
+        pull_request.head.ref,
     )
 
     if filecmp.cmp(base_file, head_file):
@@ -68,7 +70,7 @@ def validate_pull_request(event: PullRequestEvent) -> None:
         return
 
     output = StringIO()
-    printer = IndentingPrinter(output)
+    printer = IndentingPrinter(output, log_level=log_level)
     operation = LocalPlanOperation("-BASE", False, False, "")
     operation.init(otterdog_config, printer)
 
@@ -78,14 +80,18 @@ def validate_pull_request(event: PullRequestEvent) -> None:
     logger.info(text)
 
     result = f"""
+This is your friendly self-service bot. Please find below the validation of the requested configuration changes:
+
 <details>
-<summary>Diff for {event.pull_request.head.sha}</summary>
+<summary>Diff for {pull_request.head.sha}</summary>
 
 ```diff
 {escape_for_github(text)}
 ```
 
 </details>
+
+Add a comment `/help` to get a list of available commands.
     """
 
     rest_api.issue.create_comment(org_id, otterdog_config.default_config_repo, pull_request_number, result)
