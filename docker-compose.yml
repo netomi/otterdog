@@ -8,17 +8,29 @@ services:
     env_file: .env
     ports:
       - '${REDIS_PORT}:${REDIS_PORT}'
-#    networks:
-#      - web_network
-
-#  appseed-app:
-#    container_name: appseed-app
-#    restart: always
+  webapp:
+    container_name: webapp
+    restart: always
+    env_file: .env
+    build:
+      context: .
+      dockerfile: Dockerfile.app
+    ports:
+      - 5000:5000
+    depends_on:
+      - redis
+#      - db
+    volumes:
+      - ./github-app:/app/github-app
+#  db:
+#    image: postgres:14-alpine
+#    volumes:
+#      - postgres_data:/var/lib/postgresql/data/
 #    env_file: .env
-#    build: .
-#    networks:
-#      - db_network
-#      - web_network
+#    environment:
+#      - POSTGRES_DB=${DB_NAME}
+#      - POSTGRES_USER=${DB_USERNAME}
+#      - POSTGRES_PASSWORD=${DB_PASS}
 #  nginx:
 #    container_name: nginx
 #    restart: always
@@ -31,10 +43,3 @@ services:
 #      - web_network
 #    depends_on:
 #      - appseed-app
-
-#networks:
-#  db_network:
-#    driver: bridge
-#  web_network:
-#    driver: bridge
-#
