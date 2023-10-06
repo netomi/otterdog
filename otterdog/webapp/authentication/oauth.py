@@ -7,8 +7,6 @@ from .models import Users, db, OAuth
 
 
 github_blueprint = make_github_blueprint(
-    # client_id=Config.GITHUB_OAUTH_CLIENT_ID,
-    # client_secret=Config.GITHUB_OAUTH_CLIENT_SECRET,
     scope='user',
     storage=SQLAlchemyStorage(
         OAuth,

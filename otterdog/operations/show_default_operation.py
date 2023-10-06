@@ -11,9 +11,9 @@ import textwrap
 from colorama import Style, Fore
 
 from otterdog.config import OrganizationConfig
+from otterdog.utils import jsonnet_evaluate_snippet
 
 from . import Operation
-from ..utils import jsonnet_evaluate_snippet
 
 
 class ShowDefaultOperation(Operation):

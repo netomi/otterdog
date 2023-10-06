@@ -9,7 +9,9 @@
 from __future__ import annotations
 
 from abc import ABC
+from datetime import datetime
 from functools import cached_property
+from typing import Optional
 
 from .auth import AuthStrategy
 from .requester import Requester
@@ -21,7 +23,17 @@ class RestApi:
     _GH_API_URL_ROOT = "https://api.github.com"
 
     def __init__(self, auth_strategy: AuthStrategy):
+        self._auth_strategy = auth_strategy
         self._requester = Requester(auth_strategy, self._GH_API_URL_ROOT, self._GH_API_VERSION)
+
+    @property
+    def token(self) -> Optional[str]:
+        from .auth.token import TokenAuthStrategy
+
+        if isinstance(self._auth_strategy, TokenAuthStrategy):
+            return self._auth_strategy.token
+        else:
+            return None
 
     def close(self) -> None:
         self._requester.close()
@@ -91,3 +103,10 @@ def encrypt_value(public_key: str, secret_value: str) -> str:
     sealed_box = public.SealedBox(public_key_obj)
     encrypted = sealed_box.encrypt(secret_value.encode("utf-8"))
     return b64encode(encrypted).decode("utf-8")
+
+
+_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
+
+
+def parse_date_string(date: str) -> datetime:
+    return datetime.strptime(date, _FORMAT)

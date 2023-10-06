@@ -19,8 +19,6 @@ from otterdog.models.github_organization import GitHubOrganization
 from otterdog.providers.github import GitHubProvider
 from otterdog.utils import (
     IndentingPrinter,
-    print_warn,
-    print_error,
     Change,
     is_info_enabled,
 )
@@ -79,7 +77,7 @@ class DiffOperation(Operation):
         try:
             self._gh_client = self.setup_github_client(org_config)
         except RuntimeError as e:
-            print_error(f"invalid credentials\n{str(e)}")
+            self.printer.print_error(f"invalid credentials\n{str(e)}")
             return 1
 
         self.printer.level_up()
@@ -113,13 +111,15 @@ class DiffOperation(Operation):
         org_file_name = jsonnet_config.org_config_file
 
         if not os.path.exists(org_file_name):
-            print_error(f"configuration file '{org_file_name}' does not yet exist, run fetch-config or import first")
+            self.printer.print_error(
+                f"configuration file '{org_file_name}' does not yet exist, run fetch-config or import first"
+            )
             return 1
 
         try:
             expected_org = self.load_expected_org(github_id, org_file_name)
         except RuntimeError as e:
-            print_error(f"failed to load configuration\n{str(e)}")
+            self.printer.print_error(f"failed to load configuration\n{str(e)}")
             return 1
 
         # We validate the configuration first and only calculate a plan if
@@ -128,7 +128,7 @@ class DiffOperation(Operation):
             validation_infos,
             validation_warnings,
             validation_errors,
-        ) = self._validator.validate(expected_org, jsonnet_config.template_dir)
+        ) = self._validator.validate(expected_org, jsonnet_config.template_dir, self.printer)
         if validation_errors > 0:
             self.printer.println("Planning aborted due to validation errors.")
             return validation_errors
@@ -142,7 +142,7 @@ class DiffOperation(Operation):
         try:
             current_org = self.load_current_org(github_id, jsonnet_config)
         except RuntimeError as e:
-            print_error(f"failed to load current configuration\n{str(e)}")
+            self.printer.print_error(f"failed to load current configuration\n{str(e)}")
             return 1
 
         diff_status = DiffStatus()
@@ -191,7 +191,7 @@ class DiffOperation(Operation):
             change = context.modified_org_settings["web_commit_signoff_required"]
             if change.to_value is False:
                 if self.verbose_output():
-                    print_warn(
+                    self.printer.print_warn(
                         "Setting 'web_commit_signoff_required' setting has been disabled on "
                         "organization level. \nThe effective setting on repo level can only be "
                         "determined once this change has been applied.\n"
