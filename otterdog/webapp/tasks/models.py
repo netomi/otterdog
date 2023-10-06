@@ -41,6 +41,7 @@ class Repository(BaseModel):
     full_name: str
     private: bool
     owner: Actor
+    default_branch: str
 
 
 class Actor(BaseModel):
@@ -74,6 +75,7 @@ class PullRequest(BaseModel):
     body: Optional[str]
     draft: bool
     merged: bool
+    merge_commit_sha: Optional[str]
     user: Actor
 
     head: Ref
@@ -95,3 +97,17 @@ class PullRequestEvent(Event):
     number: int
     pull_request: PullRequest
     repository: Repository
+
+
+class PushEvent(Event):
+    """A payload sent for push events."""
+
+    ref: str
+    before: str
+    after: str
+
+    repository: Repository
+
+    created: bool
+    deleted: bool
+    forced: bool
