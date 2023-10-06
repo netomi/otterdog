@@ -12,7 +12,7 @@ from colorama import Style, Fore
 
 from otterdog.config import OrganizationConfig
 from otterdog.models.github_organization import GitHubOrganization
-from otterdog.utils import print_error, sort_jsonnet, strip_trailing_commas
+from otterdog.utils import sort_jsonnet, strip_trailing_commas
 
 from . import Operation
 
@@ -34,13 +34,15 @@ class CanonicalDiffOperation(Operation):
         org_file_name = jsonnet_config.org_config_file
 
         if not os.path.exists(org_file_name):
-            print_error(f"configuration file '{org_file_name}' does not yet exist, run fetch-config or import first")
+            self.printer.print_error(
+                f"configuration file '{org_file_name}' does not yet exist, run fetch-config or import first"
+            )
             return 1
 
         try:
             organization = GitHubOrganization.load_from_file(github_id, org_file_name, self.config)
         except RuntimeError as ex:
-            print_error(f"failed to load configuration: {str(ex)}")
+            self.printer.print_error(f"failed to load configuration: {str(ex)}")
             return 1
 
         with open(org_file_name, "r") as file:

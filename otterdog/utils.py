@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from argparse import Namespace
 from dataclasses import dataclass
 from typing import Any, Callable, Literal, TypeVar, Generic, Optional, TypeGuard, TextIO
@@ -46,43 +47,43 @@ def is_trace_enabled() -> bool:
     return _verbose_level >= 3
 
 
-def print_info(msg: str) -> None:
+def print_info(msg: str, printer: TextIO = sys.stdout) -> None:
     if is_info_enabled():
-        _print_message(msg, Fore.GREEN, "Info")
+        _print_message(msg, Fore.GREEN, "Info", printer)
 
 
-def print_debug(msg: str) -> None:
+def print_debug(msg: str, printer: TextIO = sys.stdout) -> None:
     if is_debug_enabled():
-        print(f"{Fore.CYAN}[DEBUG]{Style.RESET_ALL} " + msg)
+        print(f"{Fore.CYAN}[DEBUG]{Style.RESET_ALL} " + msg, printer)
 
 
-def print_trace(msg: str) -> None:
+def print_trace(msg: str, printer: TextIO = sys.stdout) -> None:
     if is_trace_enabled():
-        print(f"{Fore.MAGENTA}[TRACE]{Style.RESET_ALL} " + msg)
+        print(f"{Fore.MAGENTA}[TRACE]{Style.RESET_ALL} " + msg, printer)
 
 
-def print_warn(msg: str) -> None:
-    _print_message(msg, Fore.YELLOW, "Warning")
+def print_warn(msg: str, printer: TextIO = sys.stdout) -> None:
+    _print_message(msg, Fore.YELLOW, "Warning", printer)
 
 
-def print_error(msg: str) -> None:
-    _print_message(msg, Fore.RED, "Error")
+def print_error(msg: str, printer: TextIO = sys.stdout) -> None:
+    _print_message(msg, Fore.RED, "Error", printer)
 
 
-def _print_message(msg: str, color: str, level: str) -> None:
-    print(f"{color}╷")
+def _print_message(msg: str, color: str, level: str, printer: TextIO) -> None:
+    printer.write(f"{color}╷\n")
 
     lines = msg.splitlines()
 
     if len(lines) > 1:
-        print(f"│ {level}:{Style.RESET_ALL} {Style.BRIGHT}{lines[0]}{Style.RESET_ALL}")
-        print(f"{color}│{Style.RESET_ALL}")
+        printer.write(f"│ {level}:{Style.RESET_ALL} {Style.BRIGHT}{lines[0]}{Style.RESET_ALL}\n")
+        printer.write(f"{color}│{Style.RESET_ALL}\n")
         for line in lines[1:]:
-            print(f"{color}│{Style.RESET_ALL}    {line}")
+            printer.write(f"{color}│{Style.RESET_ALL}    {line}\n")
     else:
-        print(f"│ {level}:{Style.RESET_ALL} {msg}")
+        printer.write(f"│ {level}:{Style.RESET_ALL} {msg}\n")
 
-    print(f"{color}╵{Style.RESET_ALL}")
+    printer.write(f"{color}╵{Style.RESET_ALL}\n")
 
 
 class _Unset:
@@ -277,6 +278,21 @@ class IndentingPrinter:
     def level_down(self) -> None:
         self._level -= 1
         assert self._level >= 0
+
+    def print_info(self, msg: str) -> None:
+        print_info(msg, self._writer)
+
+    def print_debug(self, msg: str) -> None:
+        print_debug(msg, self._writer)
+
+    def print_trace(self, msg: str) -> None:
+        print_trace(msg, self._writer)
+
+    def print_warn(self, msg: str) -> None:
+        print_warn(msg, self._writer)
+
+    def print_error(self, msg: str) -> None:
+        print_error(msg, self._writer)
 
 
 def jsonnet_evaluate_file(file: str) -> dict[str, Any]:

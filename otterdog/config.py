@@ -61,6 +61,10 @@ class OrganizationConfig:
     def credential_data(self) -> dict[str, Any]:
         return self._credential_data
 
+    @credential_data.setter
+    def credential_data(self, data: dict[str, Any]) -> None:
+        self._credential_data = data
+
     def __repr__(self) -> str:
         return (
             f"OrganizationConfig('{self.name}', '{self.github_id}', '{self.eclipse_project}', "

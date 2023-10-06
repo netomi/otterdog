@@ -6,25 +6,35 @@
 # SPDX-License-Identifier: MIT
 # *******************************************************************************
 
+"""Data classes for events received via webhook from GitHub."""
+
+
 from __future__ import annotations
 
+from abc import ABC
 from typing import Optional
 
 from pydantic import BaseModel
 
 
 class Installation(BaseModel):
+    """The installation that is associated with the event."""
+
     id: int
     node_id: str
 
 
 class Organization(BaseModel):
+    """The organization that is associated with the event."""
+
     login: str
     id: int
     node_id: str
 
 
 class Repository(BaseModel):
+    """A reference to the repository."""
+
     id: int
     node_id: str
     name: str
@@ -34,6 +44,8 @@ class Repository(BaseModel):
 
 
 class Actor(BaseModel):
+    """An actor, can be either of type 'User' or 'Organization'."""
+
     login: str
     id: int
     node_id: str
@@ -41,6 +53,8 @@ class Actor(BaseModel):
 
 
 class Ref(BaseModel):
+    """A ref in a repository."""
+
     label: str
     ref: str
     sha: str
@@ -48,20 +62,9 @@ class Ref(BaseModel):
     repo: Repository
 
 
-class Event(BaseModel):
-    action: str
-    installation: Installation
-    organization: Organization
-    sender: Actor
-
-
-class PullRequestEvent(Event):
-    number: int
-    pull_request: PullRequest
-    repository: Repository
-
-
 class PullRequest(BaseModel):
+    """Represents a pull request."""
+
     id: int
     node_id: str
     number: int
@@ -75,3 +78,20 @@ class PullRequest(BaseModel):
 
     head: Ref
     base: Ref
+
+
+class Event(ABC, BaseModel):
+    """Base class of events"""
+
+    action: str
+    installation: Installation
+    organization: Organization
+    sender: Actor
+
+
+class PullRequestEvent(Event):
+    """A payload sent for pull request specific events."""
+
+    number: int
+    pull_request: PullRequest
+    repository: Repository

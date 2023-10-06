@@ -13,7 +13,7 @@ from colorama import Style
 
 from otterdog.config import OrganizationConfig
 from otterdog.providers.github import GitHubProvider
-from otterdog.utils import print_error, is_info_enabled
+from otterdog.utils import is_info_enabled
 
 from . import Operation
 
@@ -46,7 +46,7 @@ class ListAppsOperation(Operation):
             try:
                 credentials = self.config.get_credentials(org_config)
             except RuntimeError as e:
-                print_error(f"invalid credentials\n{str(e)}")
+                self.printer.print_error(f"invalid credentials\n{str(e)}")
                 return 1
 
             with GitHubProvider(credentials) as provider:

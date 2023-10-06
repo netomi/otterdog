@@ -6,11 +6,12 @@
 # SPDX-License-Identifier: MIT
 # *******************************************************************************
 
+from datetime import datetime
 from typing import Any
 
 from otterdog.utils import print_debug
 
-from . import RestApi, RestClient
+from . import RestApi, RestClient, parse_date_string
 from ..exception import GitHubException
 
 
@@ -36,12 +37,12 @@ class AppClient(RestClient):
             tb = ex.__traceback__
             raise RuntimeError(f"failed retrieving authenticated app:\n{ex}").with_traceback(tb)
 
-    def create_installation_access_token(self, installation_id: str) -> str:
+    def create_installation_access_token(self, installation_id: str) -> tuple[str, datetime]:
         print_debug(f"creating an installation access token for installation '{installation_id}'")
 
         try:
             response = self.requester.request_json("POST", f"/app/installations/{installation_id}/access_tokens")
-            return response["token"]
+            return response["token"], parse_date_string(response["expires_at"])
         except GitHubException as ex:
             tb = ex.__traceback__
             raise RuntimeError(f"failed creating installation access token:\n{ex}").with_traceback(tb)
