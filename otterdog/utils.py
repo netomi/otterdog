@@ -303,11 +303,11 @@ class IndentingPrinter:
             _print_message(msg, Fore.GREEN, "Info", self._writer)
 
     def print_warn(self, msg: str) -> None:
-        if self._is_logging_enabled(2, is_info_enabled):
+        if self._is_logging_enabled(2, lambda: True):
             _print_message(msg, Fore.YELLOW, "Warning", self._writer)
 
     def print_error(self, msg: str) -> None:
-        if self._is_logging_enabled(3, is_info_enabled):
+        if self._is_logging_enabled(3, lambda: True):
             _print_message(msg, Fore.YELLOW, "Error", self._writer)
 
 
