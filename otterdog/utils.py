@@ -55,12 +55,12 @@ def print_info(msg: str, printer: TextIO = sys.stdout) -> None:
 
 def print_debug(msg: str, printer: TextIO = sys.stdout) -> None:
     if is_debug_enabled():
-        print(f"{Fore.CYAN}[DEBUG]{Style.RESET_ALL} " + msg, printer)
+        printer.write(f"{Fore.CYAN}[DEBUG]{Style.RESET_ALL} " + msg + "\n")
 
 
 def print_trace(msg: str, printer: TextIO = sys.stdout) -> None:
     if is_trace_enabled():
-        print(f"{Fore.MAGENTA}[TRACE]{Style.RESET_ALL} " + msg, printer)
+        printer.write(f"{Fore.MAGENTA}[TRACE]{Style.RESET_ALL} " + msg + "\n")
 
 
 def print_warn(msg: str, printer: TextIO = sys.stdout) -> None:
