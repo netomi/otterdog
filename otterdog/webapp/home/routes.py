@@ -5,7 +5,6 @@ from jinja2 import TemplateNotFound
 from otterdog.webapp.home import blueprint
 
 
-@blueprint.route('/')
 @blueprint.route('/index')
 @blueprint.route('/index.html')
 @login_required

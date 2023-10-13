@@ -13,6 +13,8 @@ from ..authentication.util import verify_pass
 
 @blueprint.route('/')
 def route_default():
+    if not current_user.is_authenticated:
+        return redirect(url_for('home_blueprint.index'))
     return redirect(url_for('authentication_blueprint.login'))
 
 
@@ -101,7 +103,8 @@ def logout():
 
 @login_manager.unauthorized_handler
 def unauthorized_handler():
-    return render_template('home/page-403.html'), 403
+    # return render_template('home/page-403.html'), 403
+    return redirect(url_for('authentication_blueprint.login'))
 
 
 @blueprint.errorhandler(403)
