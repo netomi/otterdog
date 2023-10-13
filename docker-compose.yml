@@ -14,7 +14,8 @@ services:
     env_file: .env
     build:
       context: .
-      dockerfile: Dockerfile.app
+      dockerfile: docker/Dockerfile
+    command: ./start-webapp
     ports:
       - 5000:5000
     depends_on:
@@ -22,6 +23,31 @@ services:
 #      - db
     volumes:
       - ./github-app:/app/github-app
+
+  celery_worker:
+    container_name: celery-worker
+    restart: always
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    command: ./start-celery-worker
+    env_file: .env
+    depends_on:
+      - redis
+    volumes:
+      - ./github-app:/app/github-app
+
+  nginx:
+    container_name: nginx
+    restart: always
+    image: "nginx:latest"
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+    depends_on:
+      - webapp
+
 #  db:
 #    image: postgres:14-alpine
 #    volumes:
@@ -31,15 +57,3 @@ services:
 #      - POSTGRES_DB=${DB_NAME}
 #      - POSTGRES_USER=${DB_USERNAME}
 #      - POSTGRES_PASSWORD=${DB_PASS}
-#  nginx:
-#    container_name: nginx
-#    restart: always
-#    image: "nginx:latest"
-#    ports:
-#      - "85:85"
-#    volumes:
-#      - ./nginx:/etc/nginx/conf.d
-#    networks:
-#      - web_network
-#    depends_on:
-#      - appseed-app
