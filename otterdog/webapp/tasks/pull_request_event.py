@@ -6,7 +6,9 @@
 # SPDX-License-Identifier: MIT
 # *******************************************************************************
 
+
 from logging import getLogger
+from tempfile import TemporaryDirectory
 from typing import Any
 
 from celery import shared_task  # type: ignore
@@ -36,10 +38,16 @@ def handle_pull_request_event(event_data: dict[str, Any]) -> None:
         return
 
     if event.action in ["opened", "synchronize", "edited"] and event.pull_request.draft is False:
-        validate_pull_request(
-            event.organization.login, event.installation.id, event.pull_request, event.repository, otterdog_config
-        )
+        with TemporaryDirectory() as tmp_dir_name:
+            otterdog_config.jsonnet_base_dir = tmp_dir_name
+
+            validate_pull_request(
+                event.organization.login, event.installation.id, event.pull_request, event.repository, otterdog_config
+            )
     elif event.action in ["closed"] and event.pull_request.merged is True:
-        apply_pull_request(
-            event.organization.login, event.installation.id, event.pull_request, event.repository, otterdog_config
-        )
+        with TemporaryDirectory() as tmp_dir_name:
+            otterdog_config.jsonnet_base_dir = tmp_dir_name
+
+            apply_pull_request(
+                event.organization.login, event.installation.id, event.pull_request, event.repository, otterdog_config
+            )

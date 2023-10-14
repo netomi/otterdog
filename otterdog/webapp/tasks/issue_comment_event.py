@@ -8,6 +8,7 @@
 
 import re
 from logging import getLogger
+from tempfile import TemporaryDirectory
 from typing import Any
 
 from celery import shared_task  # type: ignore
@@ -66,9 +67,12 @@ def handle_issue_comment_event(event_data: dict[str, Any]) -> None:
             logger.error("failed to load pull request event data", exc_info=True)
             return
 
-        validate_pull_request(
-            org_id, installation_id, pull_request, event.repository, otterdog_config, log_level=log_level
-        )
+        with TemporaryDirectory() as tmp_dir_name:
+            otterdog_config.jsonnet_base_dir = tmp_dir_name
+
+            validate_pull_request(
+                org_id, installation_id, pull_request, event.repository, otterdog_config, log_level=log_level
+            )
 
 
 def create_help_comment(org_id: str, installation_id: int, repo_name: str, pull_request_number: int) -> None:

@@ -134,6 +134,10 @@ class OtterdogConfig:
     def jsonnet_base_dir(self) -> str:
         return self._jsonnet_base_dir
 
+    @jsonnet_base_dir.setter
+    def jsonnet_base_dir(self, jsonnet_base_dir: str) -> None:
+        self._jsonnet_base_dir = jsonnet_base_dir
+
     @property
     def local_mode(self) -> bool:
         return self._local_mode
