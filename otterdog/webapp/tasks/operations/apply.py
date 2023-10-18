@@ -63,6 +63,7 @@ def apply_pull_request(
     get_config(
         rest_api,
         org_id,
+        org_id,
         otterdog_config.default_config_repo,
         head_file,
         pull_request.merge_commit_sha,
