@@ -15,6 +15,8 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile
+      args:
+        DEBUG: ${DEBUG}
     command: ./start-webapp
     ports:
       - 5000:5000
@@ -22,6 +24,7 @@ services:
       - redis
 #      - db
     volumes:
+      - ./otterdog:/app/otterdog
       - ./github-app:/app/github-app
 
   celery_worker:
@@ -30,11 +33,14 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile
+      args:
+        DEBUG: ${DEBUG}
     command: ./start-celery-worker
     env_file: .env
     depends_on:
       - redis
     volumes:
+      - ./otterdog:/app/otterdog
       - ./github-app:/app/github-app
 
   nginx:
