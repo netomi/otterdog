@@ -59,8 +59,8 @@ def validate_pull_request(
     head_file = jsonnet_config.org_config_file
     get_config(
         rest_api,
-        org_id,
-        otterdog_config.default_config_repo,
+        pull_request.head.repo.owner.login,
+        pull_request.head.repo.name,
         head_file,
         pull_request.head.ref,
     )
