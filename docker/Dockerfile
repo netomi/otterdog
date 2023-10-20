@@ -1,5 +1,3 @@
-ARG DEBUG=false
-
 # build jsonnet-bundler using a go environment
 FROM docker.io/library/golang:1.18 AS builder-go
 RUN go install -a github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb@v0.5.1
@@ -26,10 +24,9 @@ COPY pyproject.toml poetry.lock README.md gunicorn-cfg.py ./
 RUN pip install "poetry==$POETRY_VERSION"
 
 RUN poetry config virtualenvs.in-project true && \
-    poetry install --only=main,app --no-root
-
-ARG DEBUG
-RUN if [ "$DEBUG" != "True" ] ; then poetry build && poetry install --only-root ; fi
+    poetry install --only=main,app --no-root && \
+    poetry build && \
+    poetry install --only-root
 
 # create the final image having python3.10 as base
 FROM python:3.10.10-slim

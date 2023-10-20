@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  webapp:
+    volumes:
+      - ./otterdog:/app/otterdog
+
+  celery_worker:
+    volumes:
+      - ./otterdog:/app/otterdog
