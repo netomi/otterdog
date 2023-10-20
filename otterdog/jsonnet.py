@@ -32,6 +32,7 @@ class JsonnetConfig:
     create_repo_webhook = "newRepoWebhook"
     create_repo_secret = "newRepoSecret"
     create_branch_protection_rule = "newBranchProtectionRule"
+    create_repo_ruleset = "newRepoRuleset"
     create_environment = "newEnvironment"
 
     def __init__(self, org_id: str, base_dir: str, base_template_url: str, local_only: bool):
@@ -57,7 +58,8 @@ class JsonnetConfig:
         self._default_repo_config: dict[str, Any] | None = None
         self._default_repo_webhook_config: dict[str, Any] | None = None
         self._default_repo_secret_config: dict[str, Any] | None = None
-        self._default_branch_config: dict[str, Any] | None = None
+        self._default_branch_protection_rule_config: dict[str, Any] | None = None
+        self._default_repo_ruleset_config: dict[str, Any] | None = None
         self._default_environment_config: dict[str, Any] | None = None
 
         self._initialized = False
@@ -119,9 +121,16 @@ class JsonnetConfig:
         try:
             # load the default branch protection rule config
             branch_protection_snippet = f"(import '{template_file}').{self.create_branch_protection_rule}('default')"
-            self._default_branch_config = jsonnet_evaluate_snippet(branch_protection_snippet)
+            self._default_branch_protection_rule_config = jsonnet_evaluate_snippet(branch_protection_snippet)
         except RuntimeError as ex:
             raise RuntimeError(f"failed to get default branch protection rule config: {ex}")
+
+        try:
+            # load the default repo ruleset config
+            branch_protection_snippet = f"(import '{template_file}').{self.create_repo_ruleset}('default')"
+            self._default_repo_ruleset_config = jsonnet_evaluate_snippet(branch_protection_snippet)
+        except RuntimeError as ex:
+            raise RuntimeError(f"failed to get default repo ruleset config: {ex}")
 
         try:
             # load the default environment config
@@ -165,8 +174,12 @@ class JsonnetConfig:
         return self._default_repo_secret_config
 
     @property
-    def default_branch_config(self):
-        return self._default_branch_config
+    def default_branch_protection_rule_config(self):
+        return self._default_branch_protection_rule_config
+
+    @property
+    def default_repo_ruleset_config(self):
+        return self._default_repo_ruleset_config
 
     @property
     def default_environment_config(self):

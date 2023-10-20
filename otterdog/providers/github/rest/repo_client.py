@@ -267,6 +267,15 @@ class RepoClient(RestClient):
 
         print_debug(f"removed repo webhook with url '{url}'")
 
+    async def async_get_rulesets(self, org_id: str, repo_name: str) -> list[dict[str, Any]]:
+        print_debug(f"async retrieving rulesets for repo '{org_id}/{repo_name}'")
+
+        try:
+            return await self.requester.async_request_json("GET", f"/repos/{org_id}/{repo_name}/rulesets")
+        except GitHubException as ex:
+            tb = ex.__traceback__
+            raise RuntimeError(f"failed retrieving rulesets for repo '{org_id}/{repo_name}':\n{ex}").with_traceback(tb)
+
     @staticmethod
     def _render_template_content(org_id: str, repo_name: str, content: str) -> str:
         variables = {"org": org_id, "repo": repo_name}

@@ -1,0 +1,65 @@
+{
+  "$id": "repository-ruleset.json",
+
+  "type": "object",
+  "properties": {
+    "name": { "type": "string" },
+    "enforcement": { "type": "string" },
+
+    "allows_deletions": { "type": "boolean" },
+    "allows_force_pushes": { "type": "boolean" },
+    "dismisses_stale_reviews": { "type": "boolean" },
+    "is_admin_enforced": { "type": "boolean" },
+    "lock_allows_fetch_and_merge": { "type": "boolean" },
+    "lock_branch": { "type": "boolean" },
+    "bypass_force_push_allowances": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "bypass_pull_request_allowances": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "restricts_pushes": { "type": "boolean" },
+    "blocks_creations": { "type": "boolean" },
+    "push_restrictions": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "require_last_push_approval": { "type": "boolean" },
+    "required_approving_review_count": { "$ref": "#/definitions/integer_or_null" },
+    "requires_pull_request": { "type": "boolean" },
+    "requires_code_owner_reviews": { "type": "boolean" },
+    "requires_commit_signatures": { "type": "boolean" },
+    "requires_conversation_resolution": { "type": "boolean" },
+    "requires_linear_history": { "type": "boolean" },
+    "requires_status_checks": { "type": "boolean" },
+    "requires_strict_status_checks": { "type": "boolean" },
+    "restricts_review_dismissals": { "type": "boolean" },
+    "review_dismissal_allowances": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "required_status_checks": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "requires_deployments": { "type":  "boolean" },
+    "required_deployment_environments": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+
+  "required": [ "name", "enforcement" ],
+  "additionalProperties": false,
+
+  "definitions": {
+    "integer_or_null": {
+      "anyOf": [
+          { "type": "integer" },
+          { "type": "null" }
+        ]
+    }
+  }
+}

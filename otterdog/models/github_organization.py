@@ -40,6 +40,7 @@ from .organization_settings import OrganizationSettings
 from .organization_workflow_settings import OrganizationWorkflowSettings
 from .organization_webhook import OrganizationWebhook
 from .repository import Repository
+from .repo_ruleset import RepositoryRuleset
 from .repo_secret import RepositorySecret
 from .repo_webhook import RepositoryWebhook
 from .repo_workflow_settings import RepositoryWorkflowSettings
@@ -377,6 +378,11 @@ async def _process_single_repo(gh_client: GitHubProvider, github_id: str, repo_n
     rules = await gh_client.get_branch_protection_rules(github_id, repo_name)
     for github_rule in rules:
         repo.add_branch_protection_rule(BranchProtectionRule.from_provider_data(github_id, github_rule))
+
+    # get rulesets of the repo
+    rulesets = await rest_api.repo.async_get_rulesets(github_id, repo_name)
+    for github_ruleset in rulesets:
+        repo.add_ruleset(RepositoryRuleset.from_provider_data(github_id, github_ruleset))
 
     # get webhooks of the repo
     webhooks = await rest_api.repo.async_get_webhooks(github_id, repo_name)
