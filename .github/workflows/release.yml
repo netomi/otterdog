@@ -132,7 +132,7 @@ jobs:
         uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 # v5.5.1
         with:
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.release.outputs.release-version }}
+            ${{ needs.release.outputs.release-version }}
           labels: |
             org.opencontainers.image.version=${{ needs.release.outputs.release-version }}
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
