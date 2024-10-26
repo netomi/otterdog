@@ -200,7 +200,7 @@ jobs:
 
   github-publish:
     runs-on: ubuntu-22.04
-    needs: ['build-dist', 'provenance']
+    needs: ['release', 'build-dist', 'provenance']
     steps:
       - name: "Download dists"
         uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4.1.7
