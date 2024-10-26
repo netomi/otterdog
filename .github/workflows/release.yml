@@ -236,7 +236,7 @@ jobs:
 
   prepare-for-next-development-cycle:
     runs-on: ubuntu-22.04
-    needs: ['precheck', 'release', 'build-and-push-image', 'pypi-publish']
+    needs: ['precheck', 'release', 'pypi-publish', 'github-publish']
     permissions:
       contents: write
     if: ${{ github.event.inputs.version-fragment != 'none' }}
