@@ -212,6 +212,7 @@ jobs:
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         run: |
+          gh release create ${{ needs.release.outputs.release-tag }} --generate-notes --latest
           gh release upload ${{ needs.release.outputs.release-tag }} dist/* --repo ${{ github.repository }}
 
   pypi-publish:
