@@ -34,7 +34,7 @@ concurrency:
 jobs:
   precheck:
     runs-on: ubuntu-22.04
-    if: github.repository == 'eclipse-csi/otterdog'
+#    if: github.repository == 'eclipse-csi/otterdog'
     steps:
       - name: "Check ref"
         shell: bash
