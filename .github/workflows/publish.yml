@@ -1,12 +1,17 @@
 name: Publish
 
 on:
+  workflow_call:
+    inputs:
+      release-tag:
+        required: true
+        type: string
   push:
     tags:
       - "v*"
 
 env:
-  REGISTRY: ghcr.io
+  REGISTRY: 'ghcr.io'
   IMAGE_NAME: ${{ github.repository }}
   PYTHON_VERSION: '3.12'
   POETRY_VERSION: '1.8.4'
@@ -19,6 +24,24 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  prepare:
+    runs-on: ubuntu-22.04
+    outputs:
+      release-tag: ${{ steps.context.outputs.RELEASE_TAG }}
+      release-ref: ${{ steps.context.outputs.RELEASE_REF }}
+    steps:
+      - name: "Setup context"
+        id: context
+        shell: bash
+        run: |
+          if [ "${{ inputs.release-tag }} != "" ]; then
+            echo "RELEASE_TAG=${{ inputs.release-tag }}" >> $GITHUB_OUTPUT
+            echo "RELEASE_REF='refs/tags/${{ inputs.release-tag }}'" >> $GITHUB_OUTPUT
+          else
+            echo "RELEASE_TAG=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+            echo "RELEASE_REF=${{ github.ref }}" >> $GITHUB_OUTPUT
+          fi
+
 #  build-and-push-image:
 #    runs-on: ubuntu-22.04
 #    needs: ['release']
@@ -57,12 +80,13 @@ jobs:
 
   build-dist:
     runs-on: ubuntu-22.04
+    needs: ["prepare"]
     outputs:
       hashes: ${{ steps.hash.outputs.hashes }}
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
-          ref: ${{ github.ref }}
+          ref: ${{ needs.prepare.outputs.release-tag }}
 
       - uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c # v5.0.0
         with:
@@ -93,7 +117,7 @@ jobs:
           retention-days: 5
 
   provenance:
-    needs: ['build-dist']
+    needs: ['prepare', 'build-dist']
     permissions:
       actions: read
       contents: write
@@ -102,10 +126,11 @@ jobs:
     with:
       base64-subjects: "${{ needs.build-dist.outputs.hashes }}"
       upload-assets: true
+      upload-tag-name: "${{ needs.prepare.outputs.release-tag }}"
 
   github-publish:
     runs-on: ubuntu-22.04
-    needs: ['build-dist', 'provenance']
+    needs: ['prepare', 'build-dist', 'provenance']
     permissions:
       contents: write
     steps:
@@ -117,12 +142,16 @@ jobs:
           name: "dist"
           path: "dist/"
 
-      - name: "Upload dists to GitHub Release"
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        run: |
-          gh release create ${{ github.ref_name }} --generate-notes --latest
-          gh release upload ${{ github.ref_name }} dist/* --repo ${{ github.repository }}
+      - name: "Release"
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Otterdog ${{ needs.prepare.outputs.release-tag }}"
+          tag_name: "${{ needs.prepare.outputs.release-ref }}"
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          make_latest: true
+          files: dist/*
 
   pypi-publish:
     runs-on: ubuntu-22.04

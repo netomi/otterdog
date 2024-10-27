@@ -111,9 +111,15 @@ jobs:
           git tag ${{ steps.prepare-release.outputs.RELEASE_TAG }}
           git push origin --tags
 
+  publish:
+    needs: ['release']
+    uses: ./.github/workflows/publish.yml
+    with:
+      release-tag: "${{ needs.release.outputs.release-tag }}"
+
   prepare-for-next-development-cycle:
     runs-on: ubuntu-22.04
-    needs: ['release']
+    needs: ['publish']
     permissions:
       contents: write
     if: ${{ github.event.inputs.version-fragment != 'none' }}
