@@ -34,7 +34,7 @@ jobs:
         id: context
         shell: bash
         run: |
-          if [ "${{ inputs.release-tag }} != "" ]; then
+          if [ "${{ inputs.release-tag }}" != "" ]; then
             echo "RELEASE_TAG=${{ inputs.release-tag }}" >> $GITHUB_OUTPUT
             echo "RELEASE_REF='refs/tags/${{ inputs.release-tag }}'" >> $GITHUB_OUTPUT
           else
